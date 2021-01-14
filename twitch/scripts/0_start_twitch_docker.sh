@@ -1,0 +1,1 @@
+docker run   --volume=$(pwd)/twitch/neo4j/data:/data   --volume=$(pwd)/twitch/neo4j/logs:/logs   --volume=$(pwd)/twitch/neo4j/plugins:/plugins   --env NEO4J_AUTH=none   --env NEO4J_dbms_security_procedures_unrestricted=gds.*,apoc.*   --env NEO4J_dbms_security_procedures_allowlist=gds.*,apoc.*   --name twitch_docker   -p 8474:7474 -p 8687:7687   -d  neo4j:4.2.1

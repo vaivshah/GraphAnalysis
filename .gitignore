@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+
+# Dask
+dask-worker-space/
+
+# Large data files
+twitch/data/
+twitch/neo4j/
