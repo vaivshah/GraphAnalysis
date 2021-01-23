@@ -1,5 +1,9 @@
-from neo4j import GraphDatabase
 from tqdm import tqdm
+
+from neo4j import GraphDatabase
+from neo4j.exceptions import ClientError
+
+from . import helper as helpers
 
 class graph_driver():
     def __init__(self, uri_scheme='bolt', host='localhost', port='7687', username='neo4j', password=''):
@@ -36,6 +40,63 @@ class graph_driver():
                 res = self.format_raw_res(raw_res)
                 results.append({'query':query, 'result':res})
         return results
+    
+    def check_if_graph_exists(self, graph_name):
+        query="""CALL gds.graph.exists('{graph_name}')""".format(graph_name=graph_name)
+        res=self.run_single_query(query)
+        return res
+
+    def get_graph_information(self, graph_name):
+        query="""CALL gds.graph.list('{graph_name}')""".format(graph_name=graph_name)
+        res=self.run_single_query(query)
+        return res
+
+    def create_graph(self, graph_name):
+        query = """
+        CALL gds.graph.create(
+          '{graph_name}', 
+          {{
+            TWITCH_USER: {{
+                label:'TWITCH_USER', 
+                properties: ['days', 'views']
+                }}
+          }}, 
+          {{
+            KNOWS: {{
+                type:'KNOWS', 
+                orientation: 'UNDIRECTED',
+                properties: ['days', 'views']
+                }}
+          }} 
+        )
+        """.format(graph_name=graph_name)
+        res=self.run_single_query(query)
+        return res
+
+    @staticmethod
+    def get_gds_query(graph_name, algorithm_name, execution_mode="stream", properties={}, estimate=False):
+        properties_as_string = helpers.convert_dict_to_string(properties)
+        if estimate:
+            query="""CALL gds.{algorithm_name}.{execution_mode}.estimate('{graph_name}', {{ {properties} }})""".format(
+                algorithm_name=algorithm_name,
+                execution_mode=execution_mode,
+                graph_name=graph_name,
+                properties=properties_as_string)
+        else:
+            query="""CALL gds.{algorithm_name}.{execution_mode}('{graph_name}', {{ {properties} }})""".format(
+                algorithm_name=algorithm_name,
+                execution_mode=execution_mode,
+                graph_name=graph_name,
+                properties=properties_as_string)
+        return query
+
+    def run_gds_algorithm(self, query):
+        try:
+            res=self.run_single_query(query)
+        except ClientError as e:
+            print(e)
+            res=[{'error':e}]
+        return res
     
     def reset_graph(self, db=None):
         return self.run_single_query("MATCH (n) DETACH DELETE n")
