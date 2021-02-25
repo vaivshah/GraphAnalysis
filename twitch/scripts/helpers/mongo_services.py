@@ -252,7 +252,8 @@ class MongoDB:
         except errors.BulkWriteError as bwe:
             self.logger.error(bwe.details['writeErrors'])
             if self.verbose >= 1:
-                warn(bwe.details['writeErrors'])
+                pass
+#                 warn(bwe.details['writeErrors'])
             raise bwe
         else:
             self.logger.info(res.bulk_api_result)

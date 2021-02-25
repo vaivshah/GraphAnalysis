@@ -1,9 +1,18 @@
 import json
+import csv
 import pandas as pd
 
 def read_csv(filename):
     with open(filename, 'r') as file:
         data = pd.read_csv(file)
+        
+    return data
+
+def read_csv_as_dict(filename):
+    data=[]
+    file = csv.DictReader(open(filename, 'r'))
+    for row in file:
+        data.append(row)
         
     return data
 
