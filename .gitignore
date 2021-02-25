@@ -137,3 +137,11 @@ dask-worker-space/
 twitch/data/
 twitch/neo4j/
 twitch/mongo/
+
+
+# Pycharm specific files
+.idea/
+
+# Mlruns
+twitch/scripts/mlruns
+
